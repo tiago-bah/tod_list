@@ -93,7 +93,17 @@ function editarTarefa(item) {
 .Delete{
   color: rgb(255, 0, 0); 
 }
-
+.container{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  height: 90%;
+  background-color: rgb(116, 156, 184);
+  padding: 30px 20px 40px;
+  border-radius: 8px;
+}
 
 li{
   padding: 0 0 7px;
