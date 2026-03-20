@@ -1,16 +1,17 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  margin: auto;
   font-weight: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 a,
 .green {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: rgb(22, 128, 22);
   transition: 0.4s;
   padding: 3px;
 }
@@ -23,16 +24,17 @@ a,
 
 @media (min-width: 1024px) {
   body {
+    
     display: flex;
     place-items: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: antiquewhite;
   }
 
   #app {
-    display: flex;
-  justify-content: center;
-  align-items: start;
-  min-height: 100vh;
-  padding-top: 50px;
 
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
   }
 }
