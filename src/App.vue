@@ -100,7 +100,7 @@ function editarTarefa(item) {
   flex-direction: column;
   width: 90%;
   height: 90%;
-
+ color: black;
 }
 
 li{
