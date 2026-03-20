@@ -1,162 +1,132 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 const tarefas = ref([
-  { id: 1, desc: 'fazer o breakdance', status: 'pendente' },
-  { id: 2, desc: 'ler livros', status: 'pendente' },
-  { id: 3, desc: 'estudar o neymar', status: 'concluida' },
+  'seminario geografia',
+  'seminario portugues',
+  'avaliação matematica',
+  'avaliação fisica',
+  'folder sociologia',
 ])
+const novoItem = ref('')
+const alteracao = ref('-1')
+const buscar = ref('')
+const concluidas = ref([])
 
-const texto = ref('')
-const filtro = ref('')
-const editandoId = ref(0)
-
-const gerarID = () => {
-  return Math.max(...tarefas.value.map(item => item.id), 0) + 1
-}
-
-const acharPosicao = (id) => {
-  return tarefas.value.findIndex(item => item.id == id)
-}
-
-const salvar = () => {
-  if (texto.value.trim() === '') {
-    alert('Digite algo')
+function add() {
+  if (novoItem.value.trim().length < 5) {
+    aviso.value = true
     return
-  }
-
-  if (editandoId.value !== 0) {
-    const posicao = acharPosicao(editandoId.value)
-
-    if (posicao !== -1) {
-      tarefas.value[posicao].desc = texto.value
-    }
-
-    editandoId.value = 0
   } else {
-    tarefas.value.push({
-      id: gerarID(),
-      desc: texto.value,
-      status: 'pendente'
-    })
-  }
-
-  texto.value = ''
-}
-
-const editar = (id) => {
-  const posicao = acharPosicao(id)
-  if (posicao === -1) return
-
-  texto.value = tarefas.value[posicao].desc
-  editandoId.value = id
-}
-
-const remover = (id) => {
-  const posicao = acharPosicao(id)
-
-  if (posicao !== -1) {
-    tarefas.value.splice(posicao, 1)
-  }
-}
-
-const concluir = (id) => {
-  const posicao = acharPosicao(id)
-  if (posicao === -1) return
-
-  if (tarefas.value[posicao].status === 'pendente') {
-    tarefas.value[posicao].status = 'concluida'
-  } else {
-    tarefas.value[posicao].status = 'pendente'
-  }
-}
-
-const tarefasFiltradas = computed(() => {
-  if (filtro.value === '') return tarefas.value
-
-  return tarefas.value.filter(item =>
-    item.desc.toLowerCase().includes(filtro.value.toLowerCase())
-  )
-})
-
-const progresso = computed(() => {
-  let concluidas = 0
-  let pendentes = 0
-
-  tarefas.value.forEach(item => {
-    if (item.status === 'pendente') {
-      pendentes++
+    if (alteracao.value == -1) {
+      tarefas.value.push(novoItem.value)
+      novoItem.value = ''
     } else {
-      concluidas++
+      tarefas.value.splice(alteracao.value, 1, novoItem.value)
+      novoItem.value = ''
+      alteracao.value = -1
     }
-  })
+  }
+}
 
-  return 'Concluidas: ' + concluidas + ' | Pendentes: ' + pendentes
-})
+function concluir(item) {
+  const posicao = concluidas.value.indexOf(item)
+  if (posicao === -1) {
+    concluidas.value.push(item)
+  } else {
+    concluidas.value.splice(posicao, 1)
+  }
+}
+const aviso = ref(false)
+
+function deleteTarefa(item) {
+  const posicao = tarefas.value.indexOf(item)
+  tarefas.value.splice(posicao, 1)
+}
+function editarTarefa(item) {
+  alteracao.value = tarefas.value.indexOf(item)
+  novoItem.value = item
+}
 </script>
-
 <template>
   <div class="container">
-    <h2>{{ progresso }}</h2>
+    <h1>Lista de tarefas</h1>
 
-    <input v-model="texto" placeholder="Digite uma tarefa" @keyup.enter="salvar" />
-    <button @click="salvar">
-      {{ editandoId !== 0 ? 'Salvar' : 'Adicionar' }}
-    </button>
-
-    <button v-if="editandoId !== 0" @click="editandoId = 0; texto = ''">
-      Cancelar
-    </button>
-
+    <input
+      type="text"
+      v-model="novoItem"
+      @keyup.enter="add(novoItem)"
+      @input="novoItem.length < 5 ? (aviso = true) : (aviso = false)"
+    />
+    <button @click="add(novoItem)">add</button>
+    <div v-show="aviso" class="aviso">Digite ao menos 5 caracteres!</div>
     <ul>
-      <li v-for="item in tarefasFiltradas" :key="item.id">
+      <li
+        v-for="tarefa in tarefas"
+        :key="tarefa"
+        v-show="tarefa.toLowerCase().includes(buscar.toLowerCase())"
+      >
         <span
-          class="tarefa"
-          :class="{ concluida: item.status === 'concluida' }"
-          @click="concluir(item.id)"
+          @click="concluir(tarefa)"
+          :class="{ feito: concluidas.includes(tarefa) }"
+          style="cursor: pointer"
         >
-          {{ item.desc }} ({{ item.status }})
+          {{ tarefa }}
         </span>
-
-        <div>
-          <button @click="editar(item.id)">Editar</button>
-          <button @click="remover(item.id)">Remover</button>
-        </div>
+        <span>
+          <a href="#" @click.prevent="editarTarefa(tarefa)">Editar</a>
+          <a href="#" @click.prevent="deleteTarefa(tarefa)" class="Delete">Delete</a>
+        </span>
       </li>
     </ul>
-
-    <input v-model="filtro" placeholder="Filtrar" />
+    <p>Concluídas: {{ concluidas.length }} - Pendentes: {{ tarefas.length - concluidas.length }}</p>
+    <div>
+      <input type="text" v-model="buscar" placeholder="Buscar..." />
+    </div>
   </div>
 </template>
-
-<style>
-.container {
-  text-align: center;
-  margin-top: 40px;
-  color: black;
+<style scoped>
+.feito {
+  text-decoration: line-through;
+  color: gray;
 }
-
-ul {
-  list-style: none;
-  padding: 0;
-  width: 300px;
-  margin: 20px auto;
-}
-
-li {
-  margin-bottom: 10px;
-}
-
-.tarefa {
-  cursor: pointer;
+.Delete{
+  color: rgb(255, 0, 0); 
 }
 .container{
-  background-color: cadetblue;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   width: 90%;
   height: 90%;
+  background-color: rgb(116, 156, 184);
+  padding: 30px 20px 40px;
+  border-radius: 8px;
 }
-h2{
+h1 {
+  color: black;
   font-weight: bold;
+  padding: 0 0 10px;
 }
-
+button{
+  margin: 5px;
+  padding: 5px 40px;
+  border-radius: 5px;
+  background-color: antiquewhite;
+  font-weight: Bolder;
+}
+div{
+  color: white;
+}
+ul{
+  color: white;
+}
+li{
+  padding: 0 0 7px;
+}
+input{
+  padding: 9px;
+  border-radius: 20px;
+}
 </style>
