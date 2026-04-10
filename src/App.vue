@@ -73,7 +73,7 @@ function editarTarefa(item) {
         >
           {{ tarefa }}
         </span>
-        <span>
+        <span class="esp">
           <a href="#" @click.prevent="editarTarefa(tarefa)">Editar</a>
           <a href="#" @click.prevent="deleteTarefa(tarefa)" class="Delete">Delete</a>
         </span>
@@ -105,6 +105,24 @@ function editarTarefa(item) {
 
 li{
   padding: 0 0 7px;
+  display: flex;
+  align-items: center;
+}
+a{
+  padding: 10px 20px 10px 20px;
+  border-radius: 40px;
+  background-color:#42988f;
+  gap: 10px;
+  margin: 10px;
+  
+}
+button{
+   padding: 10px 20px 10px 20px;
+  border-radius: 40px;
+}
+li{
+  padding: 10px 10px 10px 10px;
+  gap: 10px;
 }
 
 </style>
